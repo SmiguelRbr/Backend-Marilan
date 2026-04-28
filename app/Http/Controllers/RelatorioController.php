@@ -12,28 +12,31 @@ class RelatorioController extends Controller
 {
     public function gerar(Request $request)
     {
-        // Busca com os relacionamentos para não pesar o banco
         $query = Movimentacao::with(['ferramenta', 'usuario', 'almoxarife']);
 
-        // Filtro opcional: pegar só de uma data específica
         if ($request->filled('data')) {
             $query->whereDate('created_at', $request->data);
         }
 
         $movimentacoes = $query->orderBy('created_at', 'desc')->get();
 
-        // 1. Gera Excel se o Frontend pedir
+        // DADOS PARA O RESUMO DO PDF
+        $disponiveis = \App\Models\Ferramenta::where('status', 'disponivel')->count();
+        $em_uso = \App\Models\Ferramenta::where('status', 'em_uso')->count();
+        $manutencao = \App\Models\Ferramenta::where('status', 'manutencao')->count();
+
         if ($request->formato === 'excel') {
             return Excel::download(new MovimentacaoExport($movimentacoes), 'relatorio_marilan.xlsx');
         }
 
-        // 2. Gera PDF se o Frontend pedir
         if ($request->formato === 'pdf') {
-            $pdf = Pdf::loadView('relatorios.pdf', compact('movimentacoes'));
-            return $pdf->download('relatorio_marilan.pdf');
-        }
+        // Gera um código único (ex: DOC-8F4A2B9C) para o rodapé do documento
+        $codigoDocumento = 'DOC-' . strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
+        
+        $pdf = Pdf::loadView('relatorios.pdf', compact('movimentacoes', 'disponiveis', 'em_uso', 'manutencao', 'codigoDocumento'));
+        return $pdf->download('Relatorio_Marilan_'.$codigoDocumento.'.pdf');
+    }
 
-        // 3. Padrão: devolve JSON normal para montar telas ou gráficos no App
         return response()->json($movimentacoes);
     }
 }
