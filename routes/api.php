@@ -17,6 +17,8 @@ Route::get('/relatorios/movimentacoes', [RelatorioController::class, 'gerar']);
 
 // ─── Rotas Protegidas (Bearer Token obrigatório) ──────────────────────────────
 Route::middleware(['auth:sanctum'])->group(function () {
+    // Colaborador consulta o status da sua solicitação
+    Route::get('/solicitacoes/{id}/status', [SolicitacaoController::class, 'status']);
 
     // Movimentações — só almoxarife pode retirar/devolver/trocar diretamente
     Route::post('/retirar', [MovimentacaoController::class, 'retirar']);
@@ -61,4 +63,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('role:almoxarife')->group(function () {
         // Reservado para futuras rotas de gestão
     });
+
+
+    // Fluxo de Devolução
+    Route::post('/devolucao/solicitar', [MovimentacaoController::class, 'solicitarDevolucao']); // App do Colaborador
+    Route::post('/devolucao/{id}/confirmar', [MovimentacaoController::class, 'confirmarDevolucao'])->middleware('role:almoxarife'); // App do Almoxarife (Aceita)
+    Route::post('/devolucao/{id}/recusar', [MovimentacaoController::class, 'recusarDevolucao'])->middleware('role:almoxarife'); // App do Almoxarife (Rollback)
+    Route::get('/devolucao/pendentes', [MovimentacaoController::class, 'pendentes'])->middleware('role:almoxarife');
+
 });

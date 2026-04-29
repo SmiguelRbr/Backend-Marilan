@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 
 class FerramentaController extends Controller
 {
-    public function index(Request $request)
+   public function index(Request $request)
     {
-        // Puxa as ferramentas e já traz junto a movimentação que estiver 'aberto'
+        // Puxa as ferramentas e já traz junto a movimentação que estiver 'aberto' OU 'aguardando_devolucao'
         $ferramentas = Ferramenta::with(['movimentacoes' => function($query) {
-            $query->where('status', 'aberto')->with('usuario');
+            $query->whereIn('status', ['aberto', 'aguardando_devolucao'])->with('usuario');
         }])->get();
 
-        // Moldamos os dados EXATAMENTE como o React Native do seu amigo espera
+        // Moldamos os dados EXATAMENTE como o React Native espera (seu código original)
         $dados = $ferramentas->map(function ($f) {
             $movAberta = $f->movimentacoes->first();
 
@@ -24,14 +24,19 @@ class FerramentaController extends Controller
             if ($f->status === 'manutencao') $statusFront = 'Em manutenção';
 
             return [
-                'codigo'      => $f->codigo_patrimonio,
-                'nome'        => $f->descricao,
-                'categoria'   => 'Geral', // Como não temos isso na planilha, deixamos um padrão
-                'status'      => $statusFront,
-                'alocadoPara' => $movAberta ? $movAberta->usuario->nome : null,
+                'codigo'              => $f->codigo_patrimonio,
+                'nome'                => $f->descricao,
+                'categoria'           => 'Geral', // Como não temos isso na planilha, deixamos um padrão
+                'status'              => $statusFront,
+                'alocadoPara'         => $movAberta ? $movAberta->usuario->nome : null,
+                
+                // --- AS DUAS FLAGS NOVAS PARA A DEVOLUÇÃO FUNCIONAR ---
+                'cracha_alocado'      => $movAberta ? $movAberta->usuario->cracha : null,
+                'aguardandoDevolucao' => $movAberta && $movAberta->status === 'aguardando_devolucao',
             ];
         });
 
+        // Retorna TUDO sem filtrar, para não quebrar a sua aba de Ferramentas!
         return response()->json($dados);
     }
 }

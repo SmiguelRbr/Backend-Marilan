@@ -226,4 +226,14 @@ class SolicitacaoController extends Controller
 
         return response()->json(['message' => 'Solicitação recusada.']);
     }
+
+    /**
+  * GET /solicitacoes/{id}/status
+  * Retorna o status para a tela de aguardando do colaborador.
+  */
+ public function status($id)
+ {
+     $solicitacao = \App\Models\Solicitacao::findOrFail($id);
+     return response()->json(['status' => $solicitacao->status]);
+ }
 }

@@ -81,8 +81,9 @@ class NotificacaoController extends Controller
      */
     public static function notificarFimExpediente(): void
     {
-        $limite = Carbon::now()->subHours(8);
+        $limite = Carbon::now()->subMinutes(1);
 
+        
         $movimentacoesAtrasadas = Movimentacao::with(['ferramenta', 'usuario'])
             ->where('status', 'aberto')
             ->where('created_at', '<=', $limite)
