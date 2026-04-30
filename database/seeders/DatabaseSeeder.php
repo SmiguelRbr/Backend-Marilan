@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             'nome' => 'GEOVANE',
             'oficina' => 'MPR',
             'turno' => 'ADM',
+            'nfc_id' => '08d305IC', // <-- O CÓDIGO DA SUA SIMULAÇÃO NFC (Almoxarife)
             'password' => Hash::make('123456'),
             'role' => 'almoxarife'
         ]);
@@ -26,6 +27,7 @@ class DatabaseSeeder extends Seeder
             'nome' => 'AGATHA',
             'oficina' => 'MME',
             'turno' => 'ADM',
+            'nfc_id' => null, 
             'password' => Hash::make('123456'),
             'role' => 'almoxarife'
         ]);
@@ -36,6 +38,7 @@ class DatabaseSeeder extends Seeder
             'nome' => 'PEDRO',
             'oficina' => 'MEE',
             'turno' => '1º TURNO',
+            'nfc_id' => '01020304', // <-- Colaborador (Mas na apresentação você vai digitar manual)
             'password' => Hash::make('123456'),
             'role' => 'colaborador'
         ]);
@@ -45,6 +48,7 @@ class DatabaseSeeder extends Seeder
             'nome' => 'BRUNO',
             'oficina' => 'MME',
             'turno' => 'ADM',
+            'nfc_id' => null,
             'password' => Hash::make('123456'),
             'role' => 'colaborador'
         ]);
