@@ -23,7 +23,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Movimentações — só almoxarife pode retirar/devolver/trocar diretamente
     Route::post('/retirar', [MovimentacaoController::class, 'retirar']);
     Route::post('/devolver', [MovimentacaoController::class, 'devolver']);
-    Route::post('/trocar',   [MovimentacaoController::class, 'trocar']);
+    // Route::post('/trocar',   [MovimentacaoController::class, 'trocar']);
 
     // ── Solicitações de retirada (fluxo colaborador → almoxarife) ─────────────
     //
@@ -71,4 +71,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/devolucao/{id}/recusar', [MovimentacaoController::class, 'recusarDevolucao'])->middleware('role:almoxarife'); // App do Almoxarife (Rollback)
     Route::get('/devolucao/pendentes', [MovimentacaoController::class, 'pendentes'])->middleware('role:almoxarife');
 
+    // --- Fluxo de Troca P2P (Entre Colaboradores) ---
+    Route::post('/trocas/solicitar', [\App\Http\Controllers\TrocaP2PController::class, 'solicitar']);
+    Route::get('/trocas/pendentes', [\App\Http\Controllers\TrocaP2PController::class, 'pendentes']);
+    Route::post('/trocas/{id}/aceitar', [\App\Http\Controllers\TrocaP2PController::class, 'aceitar']);
+    Route::post('/trocas/{id}/recusar', [\App\Http\Controllers\TrocaP2PController::class, 'recusar']);
 });
